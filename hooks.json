@@ -1,0 +1,25 @@
+{
+  "gravity-companion": {
+    "enabled": false,
+    "SessionStart": [
+      { "type": "command", "command": "node ./src/cli.js hook SessionStart", "timeout": 5 }
+    ],
+    "PreInvocation": [
+      { "type": "command", "command": "node ./src/cli.js hook PreInvocation", "timeout": 5 }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          { "type": "command", "command": "node ./src/cli.js hook PostToolUse", "timeout": 5 }
+        ]
+      }
+    ],
+    "PostInvocation": [
+      { "type": "command", "command": "node ./src/cli.js hook PostInvocation", "timeout": 5 }
+    ],
+    "Stop": [
+      { "type": "command", "command": "node ./src/cli.js hook Stop", "timeout": 5 }
+    ]
+  }
+}

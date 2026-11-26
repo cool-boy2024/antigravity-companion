@@ -1,0 +1,20 @@
+{
+  "$schema": "https://antigravity.google/schemas/v1/plugin.json",
+  "name": "gravity-companion",
+  "displayName": "Gravity Companion",
+  "version": "0.1.0",
+  "description": "本地任务交接与验收记录。通过官方生命周期钩子收集事件，把已观察到的进展、验证证据和未完成项放在同一处。",
+  "logo": "assets/logo.svg",
+  "author": {
+    "name": "cool-boy2024",
+    "url": "https://github.com/cool-boy2024"
+  },
+  "homepage": "https://github.com/cool-boy2024/antigravity-companion",
+  "repository": "https://github.com/cool-boy2024/antigravity-companion",
+  "license": "MIT",
+  "keywords": ["handoff", "verification", "local-first", "workflow"],
+  "suggestedPrompts": [
+    "查看 Gravity Companion 的使用说明，整理当前任务的目标、约束与下一步",
+    "生成一份包含验证证据和未验证事项的交接记录"
+  ]
+}

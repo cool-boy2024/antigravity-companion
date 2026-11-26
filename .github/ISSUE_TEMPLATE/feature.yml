@@ -1,0 +1,26 @@
+name: 功能建议
+description: 提交具体使用场景，或对照竞品提出改进
+title: "[建议] "
+body:
+  - type: textarea
+    id: scenario
+    attributes:
+      label: 使用场景与遇到的问题
+      description: 请写一个具体例子，不要上传密钥或完整私有对话。
+    validations:
+      required: true
+  - type: input
+    id: surface
+    attributes:
+      label: 客户端、版本与操作系统
+      placeholder: Antigravity App / CLI / IDE，版本，系统
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 希望如何改善
+  - type: input
+    id: source
+    attributes:
+      label: 竞品官方文档或可公开的复现材料

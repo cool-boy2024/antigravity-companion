@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Gravity Companion · 本地工作台</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="主导航">
+      <a class="brand" href="#" aria-label="Gravity Companion 首页">
+        <span class="brand-mark" aria-hidden="true">g<span>·</span></span>
+        <span>Gravity<span class="brand-second">Companion</span></span>
+      </a>
+      <div class="workspace-box"><span class="eyebrow">当前工作区</span><strong id="workspace-name">正在连接…</strong><span class="local-tag"><span class="status-dot" aria-hidden="true"></span>仅在本机运行</span></div>
+      <nav class="nav-list">
+        <button class="nav-item active" data-view="workbench" aria-current="page"><span class="nav-glyph" aria-hidden="true">▦</span>工作台</button>
+        <button class="nav-item" data-view="activity"><span class="nav-glyph" aria-hidden="true">◷</span>会话动态<span id="session-count" class="nav-count">0</span></button>
+        <button class="nav-item" data-view="competitors"><span class="nav-glyph" aria-hidden="true">⌘</span>竞品观察</button>
+        <button class="nav-item" data-view="guide"><span class="nav-glyph" aria-hidden="true">?</span>使用说明</button>
+      </nav>
+      <div class="sidebar-bottom"><p>把进展留下，<br>让下一次接得上。</p><button id="theme-toggle" class="theme-button" type="button" aria-label="切换深色模式">切换深色</button><span class="version">本地存储 · v0.1.0</span></div>
+    </aside>
+    <main>
+      <header class="topbar"><span class="breadcrumb">工作空间<span aria-hidden="true">/</span><strong id="view-label">工作台</strong></span><span id="connection" class="connection" role="status"><span class="status-dot" aria-hidden="true"></span>正在连接</span></header>
+      <div id="global-error" class="banner error-banner" role="alert" hidden></div>
+      <div id="auth-gate" class="auth-gate" hidden><span class="eyebrow">需要本机连接</span><h1>从命令行打开工作台</h1><p>安装 CLI 后，在目标工作区运行服务，并打开终端打印的完整地址。连接密钥只保存在当前浏览器会话中。</p><pre><code>gravity-companion serve</code></pre><p class="muted">从源码启动请参照项目 README。如果服务刚刚重启，请使用它打印的新地址。</p></div>
+      <section id="view-workbench" class="view">
+        <div class="page-heading"><div><span class="eyebrow">WORKSPACE / 本地工作台</span><h1>继续推进，有据可查。</h1><p>记录约束和下一步，把真实验证结果带到下一次会话。</p></div><div class="heading-actions"><button id="import-button" class="button secondary" type="button">导入交接</button><button id="new-task" class="button primary" type="button"><span aria-hidden="true">＋</span>新建任务</button><input id="import-file" type="file" accept="application/json,.json" hidden></div></div>
+        <div class="stats-row"><div class="stat-card"><span>任务记录</span><strong id="task-total">0</strong><small>目标、约束与决策</small></div><div class="stat-card"><span>验证记录</span><strong id="check-total">0</strong><small>由本地命令运行器记录</small></div><div class="stat-card"><span>活跃会话</span><strong id="active-total">0</strong><small>根据已接入的 hooks 事件</small></div></div>
+        <div class="workbench-grid">
+          <section class="task-column" aria-label="任务列表"><div class="section-title"><h2>任务</h2><span id="task-count" class="subtle-label">0 条</span></div><div id="task-list" class="task-list"></div><p class="list-footnote">所有工作记录保存在当前项目中。导出前请检查敏感信息。</p></section>
+          <div class="detail-column">
+            <section class="panel task-panel"><div class="panel-heading"><div><span class="eyebrow">TASK BRIEF</span><h2 id="editor-heading">新建任务</h2></div><span id="save-state" class="subtle-label">尚未保存</span></div>
+              <form id="task-form"><label>任务名称<input id="task-title" name="title" required maxlength="200" placeholder="例如：完成登录接口的异常处理" autocomplete="off"></label><label>目标<textarea id="task-goal" name="goal" rows="3" maxlength="12000" placeholder="这次要交付什么？怎样才算完成？"></textarea></label><div class="form-pair"><label>必须遵守的约束<textarea id="task-constraints" name="constraints" rows="4" placeholder="每行一条，例如：&#10;不修改数据库结构&#10;保留已有登录方式"></textarea></label><label>已经确定的方案<textarea id="task-decisions" name="decisions" rows="4" placeholder="每行一条，留下选择和原因"></textarea></label></div><label>下一步<textarea id="task-next-steps" name="nextSteps" rows="3" placeholder="每行一条，写明接下来需要做的事"></textarea></label><div class="form-footer"><span id="task-id" class="task-id">保存后生成任务标识</span><button id="save-task" class="button primary" type="submit">保存任务</button></div></form>
+            </section>
+            <section id="receipt-panel" class="panel" hidden><div class="panel-heading"><div><span class="eyebrow">VERIFICATION</span><h2>验收记录</h2></div><span id="receipt-status" class="badge">未验证</span></div><p class="section-copy">“已通过”表示这里记录的命令成功，任务是否满足需求仍需审查。</p><div id="receipt-warnings"></div><div id="checks-list"></div><details class="runner-help"><summary>添加一次真实验证</summary><p id="check-command-help">复制当前任务的验证命令，在终端显式运行。工作台不会在浏览器里执行命令。</p><pre><code id="check-command"></code></pre><button id="copy-check-command" class="button secondary" type="button">复制验证命令</button><p class="muted">请把示例中的 node --test 换成项目实际使用的检查程序。命令执行结果会保存在本机；项目内容变化后，原验证会标为过期。</p></details></section>
+            <section id="handoff-panel" class="panel" hidden><div class="panel-heading"><div><span class="eyebrow">HANDOFF</span><h2>带着进展继续</h2></div><span class="subtle-label">可审阅的 Markdown</span></div><p class="section-copy">导出目标、约束、决策和验证状态，交给下一次会话。</p><div class="handoff-actions"><label class="target-label">接手工具<select id="handoff-target"><option value="antigravity">Antigravity</option><option value="codex">Codex</option><option value="claude">Claude Code</option><option value="generic">通用格式</option></select></label><button id="handoff-preview" class="button primary" type="button">预览交接</button><button id="export-json" class="button secondary" type="button">导出 JSON</button></div></section>
+            <section id="notes-panel" class="panel" hidden><div class="panel-heading"><div><span class="eyebrow">NOTES</span><h2>补充记录</h2></div><span class="subtle-label">手动记录</span></div><div id="notes-list"></div><form id="note-form" class="note-form"><label class="sr-only" for="note-text">补充记录内容</label><textarea id="note-text" rows="2" maxlength="12000" placeholder="保留一个结论、待解决的问题或审查意见…" required></textarea><button id="add-note" class="button secondary" type="submit">添加记录</button></form></section>
+          </div>
+        </div>
+      </section>
+      <section id="view-activity" class="view" hidden><div class="page-heading"><div><span class="eyebrow">ACTIVITY / 会话动态</span><h1>看到发生了什么。</h1><p>来自官方 hooks 的本地事件。无输出不等于卡死，任务停止也不等于验证通过。</p></div><span id="activity-updated" class="subtle-label">等待事件</span></div><div id="activity-alerts"></div><div id="sessions-list" class="sessions-grid"></div><section class="panel event-panel"><div class="panel-heading"><h2>最近事件</h2><span class="subtle-label">不采集提示词和工具参数</span></div><div id="events-list"></div></section></section>
+      <section id="view-competitors" class="view" hidden><div class="page-heading"><div><span class="eyebrow">RESEARCH / 竞品观察</span><h1>借鉴能力，验证价值。</h1><p>对照官方文档，区分已有功能、待验证能力与我们的实现。</p></div><span id="competitor-date" class="subtle-label">正在加载</span></div><p class="banner info-banner">这是有日期的能力对照，不是实时功能探测。不同版本、套餐与客户端的可用性可能不同。</p><div id="competitors-list"></div></section>
+      <section id="view-guide" class="view guide-view" hidden><div class="page-heading"><div><span class="eyebrow">GET STARTED / 使用说明</span><h1>从一个任务开始。</h1><p>先把要做的事写清楚，再积累可以检查的工作记录。</p></div></div><div class="guide-grid"><section class="panel"><span class="step-number">01</span><h2>留下任务简报</h2><p>填写目标、不能违反的约束和已定方案。它们由你维护，不会自动从聊天记录中猜测生成。</p></section><section class="panel"><span class="step-number">02</span><h2>记录一次验证</h2><p>用 CLI 显式运行检查命令，保留退出状态、输出和项目内容快照。失败与过期会分别显示。</p><pre><code>gravity-companion check &lt;task-id&gt; -- node --test</code></pre><p>此示例要求已安装 CLI，并在目标工作区执行。也可以直接复制工作台为当前任务生成的完整命令，再把 node --test 换成项目实际使用的检查程序。</p></section><section class="panel"><span class="step-number">03</span><h2>审阅后交接</h2><p>预览 Markdown 或 JSON，检查内容和敏感信息，再交给 Codex、Claude Code 或新的反重力会话。导入的验证声明不会自动变成本机证据。</p></section><section class="panel"><span class="step-number">04</span><h2>接入官方 hooks</h2><p>按项目文档安装原生插件，或合并工作区 hooks 配置。只有接入后产生的事件才会显示在会话动态中。</p><p>面板不读取账号凭证，不修改客户端安装包，也不改变官方配额与权限策略。</p></section></div><section class="panel guide-limitations"><h2>目前的边界</h2><p>本项目是独立社区工具。没有接入聊天正文、官方额度池和宿主测试结果；不会承诺零封号或无限额度。会话安静时只显示待检查提示，hooks 事件不能证明测试通过。</p><p>交接内容和命令输出可能包含你主动写入的信息，分享前请复核。服务仅绑定本机地址，关闭终端中的服务即可停止面板。</p></section></section>
+      <footer class="page-footer"><span>Gravity Companion</span><span>工作记录留在本机，分享由你决定。</span></footer>
+    </main>
+  </div>
+  <dialog id="preview-dialog" aria-labelledby="preview-title"><div class="dialog-heading"><div><span class="eyebrow">REVIEW BEFORE SHARING</span><h2 id="preview-title">预览交接</h2></div><button id="close-preview" class="icon-button" type="button" aria-label="关闭预览">×</button></div><p id="preview-description" class="section-copy"></p><label class="sr-only" for="preview-text">预览内容</label><textarea id="preview-text" readonly spellcheck="false"></textarea><div class="dialog-footer"><span id="preview-feedback" role="status"></span><div><button id="copy-preview" class="button secondary" type="button">复制内容</button><button id="confirm-preview" class="button primary" type="button">下载文件</button></div></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div>
+</body>
+</html>

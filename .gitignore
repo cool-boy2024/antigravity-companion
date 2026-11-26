@@ -1,0 +1,6 @@
+node_modules/
+dist/
+.antigravity-companion/
+*.tgz
+.DS_Store
+coverage/
