@@ -1,10 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, rm, readFile, writeFile, readdir, mkdir, symlink } from 'node:fs/promises';
+import { mkdtemp, rm, readFile, writeFile, readdir, mkdir, symlink, stat } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
+import { createDemoWorkspace } from '../src/cli.js';
+import { readState, workspaceFingerprint, buildReceipt } from '../src/core.js';
 
 const cli = fileURLToPath(new URL('../src/cli.js', import.meta.url));
 
@@ -166,4 +168,62 @@ test('concurrent CLI task writes do not lose existing tasks', async t => {
   const result = await run(['doctor', '--workspace', directory]);
   assert.equal(result.code, 0, result.stderr);
   assert.equal(JSON.parse(result.stdout).tasks, 10);
+});
+
+test('demo workspace seeds realistic Chinese tasks with a real passing local check and cleans up', async t => {
+  const demo = await createDemoWorkspace();
+  t.after(() => demo.cleanup());
+  assert.equal((await readFile(path.join(demo.workspace, '.antigravity-companion', 'opt-in'), 'utf8')).trim(), 'local-events-v1');
+  const state = await readState(demo.workspace);
+  assert.equal(state.tasks.length, 2);
+  const verified = state.tasks.find(task => task.checks.length === 1);
+  const pending = state.tasks.find(task => task.checks.length === 0);
+  assert.ok(verified, 'demo should include one task with an executed local check');
+  assert.ok(pending, 'demo should include one pending handoff task');
+  assert.ok(pending.constraints.length >= 2 && pending.decisions.length >= 2 && pending.nextSteps.length >= 2);
+  assert.equal(verified.checks[0].source, 'local-runner');
+  assert.equal(verified.checks[0].exitCode, 0);
+  assert.match(verified.checks[0].output, /demo check ok/);
+  const currentFingerprint = await workspaceFingerprint(demo.workspace);
+  assert.equal(buildReceipt(verified, currentFingerprint).status, 'passed');
+  assert.equal(buildReceipt(pending, currentFingerprint).status, 'unverified');
+  await demo.cleanup();
+  await assert.rejects(stat(demo.workspace), { code: 'ENOENT' });
+});
+
+test('CLI demo --seed-only initializes a temporary demo workspace and demo serve cleans up on SIGTERM', async t => {
+  const seeded = await run(['demo', '--seed-only']);
+  assert.equal(seeded.code, 0, seeded.stderr);
+  const payload = JSON.parse(seeded.stdout);
+  t.after(() => rm(payload.workspace, { recursive: true, force: true }));
+  assert.equal(payload.tasks.length, 2);
+  assert.equal(payload.receiptStatus, 'passed');
+  assert.equal((await readState(payload.workspace)).tasks.length, 2);
+
+  if (process.platform === 'win32') return;
+  const child = spawn(process.execPath, [cli, 'demo', '--port', '0'], { stdio: ['ignore', 'pipe', 'pipe'] });
+  const exited = new Promise(resolve => child.once('exit', resolve));
+  let output = '';
+  let errors = '';
+  child.stderr.on('data', chunk => { errors += chunk; });
+  const info = await new Promise((resolve, reject) => {
+    const timer = setTimeout(() => { child.kill('SIGKILL'); reject(new Error(`demo startup timed out: ${errors}`)); }, 8000);
+    child.once('exit', code => { clearTimeout(timer); reject(new Error(`demo exited early (${code}): ${errors}`)); });
+    child.stdout.on('data', chunk => {
+      output += chunk;
+      const urlMatch = output.match(/http:\/\/127\.0\.0\.1:\d+\/#token=[a-f0-9]+/);
+      const dirMatch = output.match(/临时演示目录：(.+)/);
+      if (urlMatch && dirMatch) { clearTimeout(timer); resolve({ url: new URL(urlMatch[0]), workspace: dirMatch[1].trim() }); }
+    });
+  });
+  t.after(() => rm(info.workspace, { recursive: true, force: true }));
+  const token = new URLSearchParams(info.url.hash.slice(1)).get('token');
+  const response = await fetch(new URL('/api/state', info.url), { headers: { Authorization: `Bearer ${token}` } });
+  assert.equal(response.status, 200);
+  const state = await response.json();
+  assert.equal(state.tasks.length, 2);
+  assert.ok(state.tasks.some(task => task.receipt.status === 'passed'));
+  child.kill('SIGTERM');
+  await exited;
+  await assert.rejects(stat(info.workspace), { code: 'ENOENT' });
 });

@@ -14,7 +14,7 @@ async function collect(relative) {
     for (const entry of (await readdir(absolute)).sort()) await collect(`${relative}/${entry}`);
   } else if (info.isFile()) files.push(relative);
 }
-for (const entry of ['src', 'web', 'data', 'assets', 'skills', 'docs', 'scripts', 'test', 'plugin.json', 'hooks.json', 'package.json', 'README.md', 'CHANGELOG.md', 'CONTRIBUTING.md', 'LICENSE']) await collect(entry);
+for (const entry of ['src', 'web', 'data', 'assets', 'skills', 'docs', 'scripts', 'test', 'plugin.json', 'hooks.json', 'package.json', 'README.md', 'AI_INSTALL.md', 'CLAUDE.md', 'CHANGELOG.md', 'CONTRIBUTING.md', 'LICENSE']) await collect(entry);
 const table = Array.from({ length: 256 }, (_, index) => {
   let crc = index;
   for (let bit = 0; bit < 8; bit++) crc = crc & 1 ? 0xedb88320 ^ (crc >>> 1) : crc >>> 1;

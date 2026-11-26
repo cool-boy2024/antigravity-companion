@@ -2,7 +2,7 @@
   "$schema": "https://antigravity.google/schemas/v1/plugin.json",
   "name": "gravity-companion",
   "displayName": "Gravity Companion",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "本地任务交接与验收记录。通过官方生命周期钩子收集事件，把已观察到的进展、验证证据和未完成项放在同一处。",
   "logo": "assets/logo.svg",
   "author": {

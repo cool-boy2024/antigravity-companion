@@ -1,6 +1,6 @@
 {
   "name": "gravity-companion",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Local task handoffs and evidence-based verification for Google Antigravity, using documented hooks.",
   "type": "module",
   "private": false,
@@ -9,10 +9,11 @@
   "bin": { "gravity-companion": "src/cli.js" },
   "scripts": {
     "start": "node src/cli.js serve",
+    "demo": "node src/cli.js demo --open",
     "test": "node --test",
     "check": "node scripts/check.mjs",
     "package": "node scripts/package.mjs"
   },
-  "files": ["src", "web", "data", "assets", "docs", "skills", "plugin.json", "hooks.json", "README.md", "LICENSE", "CHANGELOG.md"],
+  "files": ["src", "web", "data", "assets", "docs", "skills", "plugin.json", "hooks.json", "README.md", "AI_INSTALL.md", "CLAUDE.md", "LICENSE", "CHANGELOG.md"],
   "repository": { "type": "git", "url": "https://github.com/cool-boy2024/antigravity-companion.git" }
 }

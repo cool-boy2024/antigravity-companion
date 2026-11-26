@@ -1,8 +1,34 @@
 # Gravity Companion
 
+[![License: MIT](https://img.shields.io/badge/license-MIT-28634b)](LICENSE)
+[![Node.js 22+](https://img.shields.io/badge/node-%3E%3D22-28634b)](package.json)
+[![Zero Runtime Dependencies](https://img.shields.io/badge/runtime%20deps-0-28634b)](package.json)
+[![Verify CI](https://github.com/cool-boy2024/antigravity-companion/actions/workflows/ci.yml/badge.svg)](https://github.com/cool-boy2024/antigravity-companion/actions/workflows/ci.yml)
+[![GitHub Release](https://img.shields.io/github/v/release/cool-boy2024/antigravity-companion?color=28634b)](https://github.com/cool-boy2024/antigravity-companion/releases)
+
 用官方 hooks 给 Google Antigravity 补充本地任务面板：记住目标与约束，整理交接记录，检查测试结果是否仍对应当前代码。
 
 这是独立社区项目，MIT 开源。运行需要 Node.js 22+，没有第三方运行时依赖。界面、记录和验证执行器都在本机；项目不读取 Google 登录凭据，也不轮询私有额度接口。
+
+## 界面预览
+
+![Gravity Companion 浅色本地工作台：中文任务卡片、约束与决策记录](docs/assets/workbench-light.png)
+*浅色模式 · 本地工作台：管理任务目标、硬性约束、已定方案与下一步，仅监听 `127.0.0.1`。*
+
+![Gravity Companion 深色模式：本地验收记录、命令输出与跨工具交接面板](docs/assets/workbench-dark.png)
+*深色模式 · 验收证据与跨工具交接：保留真实退出码、命令输出与文件快照，一键预览交接 Markdown / JSON。*
+
+## 🤖 懒人首选：直接发给你的 AI，一句指令自动装好
+
+把下面这段话直接复制发给 **Antigravity / Claude Code / Codex** 等 AI 助手，即可自动完成环境检查、本地测试校验、官方原生插件安装与演示启动：
+
+```text
+请帮我自动克隆并安装 https://github.com/cool-boy2024/antigravity-companion ：
+先阅读仓库的 AI_INSTALL.md、CLAUDE.md 和 docs/AGENTS.md，检查我的 Node 22+ 和 agy CLI 环境，
+完成官方原生插件校验与安装，并先帮我运行演示或初始化当前工作区，完成后告诉我如何打开工作台和启用 hooks。
+```
+
+> 全程遵循 [AI_INSTALL.md](AI_INSTALL.md) 安全流程：零第三方运行时依赖、不修改宿主安装包、不读取账号凭据，也不会擅自强开 hooks；安装完成后由你在宿主设置中按需开启。
 
 ## 现在能用什么
 
@@ -17,7 +43,19 @@
 
 ## 先在本地运行
 
+### 1 条命令体验 Demo
+
 从 [Releases](https://github.com/cool-boy2024/antigravity-companion/releases) 下载并解压，或克隆仓库。进入本项目根目录后运行：
+
+```sh
+npm run demo
+```
+
+这会执行 `node src/cli.js demo --open`：在系统临时目录创建独立演示工作区，预置 2 条中文示例任务并真实执行 1 次本地检查命令，随后在 `127.0.0.1` 启动工作台并打开浏览器。按 Ctrl+C 停止后自动清理临时目录，不改动当前仓库或宿主设置（若不想自动打开浏览器，可运行 `node src/cli.js demo`）。
+
+### 在自己的项目中使用
+
+确认 Node.js 版本为 22+ 后，对目标工作区运行：
 
 ```sh
 node --version
@@ -69,6 +107,11 @@ hooks 进程的 PATH 需要能找到 `node`。启用后新建一个测试会话�
 首版的后续工作是验证不同宿主版本的端到端接入、改善多工作区查看，以及增加可审查的工具适配器。上下文与额度目前继续使用官方入口，本面板不展示猜测数据。
 
 项目使用公开扩展机制，减少修改客户端和依赖私有接口的兼容风险。账号权限、配额与使用政策仍由提供方决定，任何社区插件都无法承诺永不封号。项目不进行账号轮换、不绕过付费额度和风控、不修改宿主权限判断。
+
+## 配套项目
+
+- **Gravity Companion（本仓库）**：零改包原生官方插件，专注任务交接与本地验收证据。
+- **[Antigravity Studio Kit](https://github.com/cool-boy2024/antigravity-studio-kit)**：桌面端界面增强套件，提供就地划词追问、全量中文汉化、四套 120Hz 主题与 512K 配额看板，与本插件定位互补、互不依赖。
 
 ## 开发和验证
 
